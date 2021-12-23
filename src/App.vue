@@ -22,9 +22,9 @@
                             </ul>
                             <br />
                             <div class="input-group">
-                                <input class="form-control" type="text" placeholder="Digite o prefixo" />
+                                <input v-model="prefix" class="form-control" type="text" placeholder="Digite o prefixo" />
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary" v-on:click="addPrefix()">
+                                    <button class="btn btn-primary" v-on:click="addPrefix(prefix)">
                                         <span class="fa fa-plus"></span>
                                     </button>
                                 </div>
@@ -45,9 +45,9 @@
                             </ul>
                             <br />
                             <div class="input-group">
-                                <input class="form-control" type="text" placeholder="Digite o sufixo" />
+                                <input v-model="sufix" class="form-control" type="text" placeholder="Digite o sufixo" />
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary" v-on:click="addSufix()">
+                                    <button class="btn btn-primary" v-on:click="addSufix(sufix)">
                                         <span class="fa fa-plus"></span>
                                     </button>
                                 </div>
@@ -81,11 +81,24 @@ export default {
     name: "App",
     data() {
         return {
+            prefix:"",
+            sufix:"",
             prefixes: ["Air", "Jet", "Flight"],
             sufixes: ["Hub", "Station", "Mart"],
             domains: ["AirHub", "AirStation"],
         };
     },
+
+    methods:{
+      addPrefix(prefix){
+        this.prefixes.push(prefix);
+        this.prefix = "";
+      },
+      addSufix(sufix){
+        this.sufixes.push(sufix);
+        this.sufix = "";
+      }
+    }
 };
 </script>
 
