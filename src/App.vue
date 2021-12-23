@@ -1,7 +1,7 @@
 <template>
 <div>
     <div id="slogan" class="text-center">
-        <h1>NameZation</h1>
+        <h1 class="orb">NameZation</h1>
         <br />
         <h6 class="text-secondary">Seu incrível gerador de nomes via Prefixos e Sufixos!</h6>
     </div>
@@ -77,8 +77,17 @@
             <div class="card">
                 <div class="card-body">
                     <ul class="list-group">
-                        <li class="list-group-item" v-for="domain in domains" v-bind:key="domain">
-                            {{ domain }}
+                        <li class="list-group-item" v-for="domain in domains" v-bind:key="domain.name">
+                            <div class="row">
+                                <div class="col-md">
+                                    {{ domain.name }}
+                                </div>
+                                <div class="col-md text-right">
+                                    <a class="btn btn-primary" v-bind:href="domain.checkout" target="_blank">
+                                        <span class="fa fa-shopping-cart"></span>
+                                    </a>
+                                </div>
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -99,7 +108,6 @@ export default {
             sufix: "",
             prefixes: ["Air", "Jet", "Flight"],
             sufixes: ["Hub", "Station", "Mart"],
-            domains: [],
         };
     },
 
@@ -107,34 +115,45 @@ export default {
         addPrefix(prefix) {
             this.prefixes.push(prefix);
             this.prefix = "";
-            this.generate();
         },
         addSufix(sufix) {
             this.sufixes.push(sufix);
             this.sufix = "";
-            this.generate();
-        },
-        generate() {
-            this.domains = [];
-            for (const prefix of this.prefixes) {
-                for (const sufix of this.sufixes) {
-                    this.domains.push(prefix + sufix);
-                }
-            }
         },
         deletePrefix(prefix) {
             this.prefixes.splice(this.prefixes.indexOf(prefix), 1);
-            this.generate();
         },
         deleteSufix(sufix) {
             this.sufixes.splice(this.sufixes.indexOf(sufix), 1);
-            this.generate();
         }
+    },
+
+    computed: {
+        // ..apenas executa qdo ocorre uma mudança em prefixes ou sufixes
+        domains() {
+            console.log('dd');
+            const domains = [];
+            for (const prefix of this.prefixes) {
+                for (const sufix of this.sufixes) {
+                    const name = prefix + sufix;
+                    const checkout = "https://registro.br/busca-dominio/?fqdn="+name;
+                    domains.push({
+                      name,
+                      checkout
+                    });
+                }
+            }
+            return domains;
+        },
     }
 };
 </script>
 
 <style>
+.orb {
+    font-family: 'Orbitron';
+}
+
 #slogan {
     margin-top: 30px;
     margin-bottom: 30px;
