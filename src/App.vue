@@ -106,8 +106,8 @@ export default {
         return {
             prefix: "",
             sufix: "",
-            prefixes: ["Air", "Jet", "Flight"],
-            sufixes: ["Hub", "Station", "Mart"],
+            prefixes: ["Pre","Su","Name"],
+            sufixes: ["Fix", "Zation"],
         };
     },
 
