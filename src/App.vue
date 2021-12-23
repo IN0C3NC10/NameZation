@@ -3,7 +3,7 @@
     <div id="slogan" class="text-center">
         <h1>NameZation</h1>
         <br />
-        <h6 class="text-secondary">Seu incrível gerador de nomes!</h6>
+        <h6 class="text-secondary">Seu incrível gerador de nomes via Prefixos e Sufixos!</h6>
     </div>
     <div id="main">
         <div class="container">
@@ -17,12 +17,19 @@
                         <div class="card-body">
                             <ul class="list-group">
                                 <li class="list-group-item" v-for="prefix in prefixes" v-bind:key="prefix">
-                                    {{ prefix }}
+                                    <div class="row">
+                                        <div class="col-md">
+                                            {{ prefix }}
+                                        </div>
+                                        <div class="col-md text-right">
+                                            <button v-on:click="deletePrefix(prefix)" class="btn btn-danger"><span class="fa fa-trash"></span></button>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                             <br />
                             <div class="input-group">
-                                <input v-model="prefix" class="form-control" type="text" placeholder="Digite o prefixo" />
+                                <input v-model="prefix" v-on:keyup.enter="addPrefix(prefix)" class="form-control" type="text" placeholder="Digite o prefixo" />
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" v-on:click="addPrefix(prefix)">
                                         <span class="fa fa-plus"></span>
@@ -40,12 +47,19 @@
                         <div class="card-body">
                             <ul class="list-group">
                                 <li class="list-group-item" v-for="sufix in sufixes" v-bind:key="sufix">
-                                    {{ sufix }}
+                                    <div class="row">
+                                        <div class="col-md">
+                                            {{ sufix }}
+                                        </div>
+                                        <div class="col-md text-right">
+                                            <button v-on:click="deleteSufix(sufix)" class="btn btn-danger"><span class="fa fa-trash"></span></button>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                             <br />
                             <div class="input-group">
-                                <input v-model="sufix" class="form-control" type="text" placeholder="Digite o sufixo" />
+                                <input v-model="sufix" v-on:keyup.enter="addSufix(sufix)" class="form-control" type="text" placeholder="Digite o sufixo" />
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" v-on:click="addSufix(sufix)">
                                         <span class="fa fa-plus"></span>
@@ -81,23 +95,41 @@ export default {
     name: "App",
     data() {
         return {
-            prefix:"",
-            sufix:"",
+            prefix: "",
+            sufix: "",
             prefixes: ["Air", "Jet", "Flight"],
             sufixes: ["Hub", "Station", "Mart"],
-            domains: ["AirHub", "AirStation"],
+            domains: [],
         };
     },
 
-    methods:{
-      addPrefix(prefix){
-        this.prefixes.push(prefix);
-        this.prefix = "";
-      },
-      addSufix(sufix){
-        this.sufixes.push(sufix);
-        this.sufix = "";
-      }
+    methods: {
+        addPrefix(prefix) {
+            this.prefixes.push(prefix);
+            this.prefix = "";
+            this.generate();
+        },
+        addSufix(sufix) {
+            this.sufixes.push(sufix);
+            this.sufix = "";
+            this.generate();
+        },
+        generate() {
+            this.domains = [];
+            for (const prefix of this.prefixes) {
+                for (const sufix of this.sufixes) {
+                    this.domains.push(prefix + sufix);
+                }
+            }
+        },
+        deletePrefix(prefix) {
+            this.prefixes.splice(this.prefixes.indexOf(prefix), 1);
+            this.generate();
+        },
+        deleteSufix(sufix) {
+            this.sufixes.splice(this.sufixes.indexOf(sufix), 1);
+            this.generate();
+        }
     }
 };
 </script>
@@ -116,5 +148,9 @@ export default {
 
 .back-main {
     background-color: rgb(8, 90, 167);
+}
+
+.text-right {
+    text-align: right;
 }
 </style>
