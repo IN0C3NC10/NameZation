@@ -40,14 +40,17 @@
 <script>
 import "bootstrap/dist/css/bootstrap.css";
 import "font-awesome/css/font-awesome.css";
-import AppItemsList from './AppItemsList.vue';
+import axios from "axios/dist/axios";
+import AppItemsList from "./AppItemsList.vue";
 export default {
-  components: { AppItemsList },
+    components: {
+        AppItemsList
+    },
     name: "App",
     data() {
         return {
-            prefixes: ["Pre","Su","Name"],
-            sufixes: ["Fix", "Zation"],
+            prefixes: [],
+            sufixes: [],
         };
     },
 
@@ -63,30 +66,57 @@ export default {
         },
         deleteSufix(sufix) {
             this.sufixes.splice(this.sufixes.indexOf(sufix), 1);
-        }
+        },
     },
 
     computed: {
         // ..apenas executa qdo ocorre uma mudança em prefixes ou sufixes
         domains() {
-            console.log('dd');
+            console.log("dd");
             const domains = [];
             for (const prefix of this.prefixes) {
                 for (const sufix of this.sufixes) {
                     const name = prefix + sufix;
-                    const checkout = "https://registro.br/busca-dominio/?fqdn="+name;
+                    const checkout = "https://registro.br/busca-dominio/?fqdn=" + name;
                     domains.push({
-                      name,
-                      checkout
+                        name,
+                        checkout,
                     });
                 }
             }
             return domains;
         },
-    }
+    },
+
+    created() {
+        axios({
+            url: "http://localhost:4000",
+            method: "post",
+            data: {
+                query: `
+                    {
+                        prefixes: items (type: "prefix") {
+                            id
+                            type
+                            description
+                        }
+                        sufixes: items (type: "sufix") {
+                            id
+                            type
+                            description
+                        }
+                    }
+                `,
+            },
+        }).then((res) => {
+            const query = res.data;
+            console.log(query.data);
+            this.prefixes = query.data.prefixes.map(prefix => prefix.description);
+            this.sufixes = query.data.sufixes.map(sufix => sufix.description);
+        });
+    },
 };
 </script>
 
 <style>
-
 </style>
