@@ -7,7 +7,7 @@
                     <AppItemsList title="Prefixos" v-bind:items="prefixes" v-on:addItem="addPrefix" v-on:deleteItem="deletePrefix"></AppItemsList>
                 </div>
                 <div class="col-md">
-                    <AppItemsList title="Sufixos" v-bind:items="sufixes" v-on:addItem="addSufix" v-on:deleteItem="deleteSufix"></AppItemsList>
+                    <AppItemsList title="Sufixos" v-bind:items="suffixes" v-on:addItem="addSuffix" v-on:deleteItem="deleteSuffix"></AppItemsList>
                 </div>
             </div>
             <br />
@@ -50,33 +50,96 @@ export default {
     data() {
         return {
             prefixes: [],
-            sufixes: [],
+            suffixes: [],
         };
     },
 
     methods: {
-        addPrefix(prefix) {
-            this.prefixes.push(prefix);
+        getPrefixes() {
+            axios({
+                url: "http://localhost:4000",
+                method: "post",
+                data: {
+                    query: `
+                    {
+                        prefixes: items (type: "prefix") {
+                            id
+                            type
+                            description
+                        }
+                    }
+                `,
+                },
+            }).then((res) => {
+                const query = res.data;
+                this.prefixes = query.data.prefixes;
+            });
         },
-        addSufix(sufix) {
-            this.sufixes.push(sufix);
+        getSuffixes() {
+            axios({
+                url: "http://localhost:4000",
+                method: "post",
+                data: {
+                    query: `
+                    {
+                        suffixes: items (type: "suffix") {
+                            id
+                            type
+                            description
+                        }
+                    }
+                `,
+                },
+            }).then((res) => {
+                const query = res.data;
+                this.suffixes = query.data.suffixes;
+            });
+        },
+        addPrefix(prefix) {
+            axios({
+                url: "http://localhost:4000",
+                method: "post",
+                data: {
+                    query: `
+                        mutation ($item: ItemInput) {
+                            saveItem(item: $item) {
+                                id
+                                type
+                                description
+                            }
+                        }
+                    `,
+                    variables: {
+                        item: {
+                            type: "prefix",
+                            description: prefix
+                        }
+                    }
+                }
+            }).then((res) => {
+                const query = res.data;
+                const saveItem = query.data.saveItem;
+                this.prefixes.push(saveItem.description);
+            });
+        },
+        addSuffix(suffix) {
+            this.suffixes.push(suffix);
         },
         deletePrefix(prefix) {
             this.prefixes.splice(this.prefixes.indexOf(prefix), 1);
         },
-        deleteSufix(sufix) {
-            this.sufixes.splice(this.sufixes.indexOf(sufix), 1);
+        deleteSuffix(suffix) {
+            this.suffixes.splice(this.suffixes.indexOf(suffix), 1);
         },
     },
 
     computed: {
-        // ..apenas executa qdo ocorre uma mudança em prefixes ou sufixes
+        // ..apenas executa qdo ocorre uma mudança em prefixes ou suffixes
         domains() {
-            console.log("dd");
             const domains = [];
             for (const prefix of this.prefixes) {
-                for (const sufix of this.sufixes) {
-                    const name = prefix + sufix;
+                for (const suffix of this.suffixes) {
+                    const name = prefix.description + suffix.description;
                     const checkout = "https://registro.br/busca-dominio/?fqdn=" + name;
                     domains.push({
                         name,
@@ -89,31 +152,8 @@ export default {
     },
 
     created() {
-        axios({
-            url: "http://localhost:4000",
-            method: "post",
-            data: {
-                query: `
-                    {
-                        prefixes: items (type: "prefix") {
-                            id
-                            type
-                            description
-                        }
-                        sufixes: items (type: "sufix") {
-                            id
-                            type
-                            description
-                        }
-                    }
-                `,
-            },
-        }).then((res) => {
-            const query = res.data;
-            console.log(query.data);
-            this.prefixes = query.data.prefixes.map(prefix => prefix.description);
-            this.sufixes = query.data.sufixes.map(sufix => sufix.description);
-        });
+        this.getPrefixes();
+        this.getSuffixes();
     },
 };
 </script>
