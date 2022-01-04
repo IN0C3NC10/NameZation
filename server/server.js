@@ -19,6 +19,7 @@ const typeDefs = `
 
     type Mutation {
         saveItem(item: ItemInput): Item
+        deleteItem(id: Int): Boolean
     }
 `;
 
@@ -37,11 +38,22 @@ const resolvers = {
         }
     },
     Mutation: {
+        // .. mutação para salvar os dados
         saveItem(_, args) {
             const item = args.item;
             item.id = Math.floor(Math.random() * 1000);
             items.push(item);
             return item;
+        },
+        // .. mutação para deletar um dado
+        deleteItem(_, args) {
+            const id = args.id;
+            const item = items.find(item => item.id === id);
+            // ..se não encontrou ninguem
+            if (!item) return false;
+            // ..se encontrou, remova na lista aqui do servidor
+            items.splice(items.indexOf(item), 1);
+            return true;
         }
     }
 }

@@ -126,7 +126,22 @@ export default {
             this.suffixes.push(suffix);
         },
         deletePrefix(prefix) {
-            this.prefixes.splice(this.prefixes.indexOf(prefix), 1);
+            axios({
+                url: "http://localhost:4000",
+                method: "post",
+                data: {
+                    query: `
+                        mutation ($id: Int) {
+                            deleteItem(id: $id)
+                        }
+                    `,
+                    variables: {
+                        id: prefix.id
+                    }
+                }
+            }).then(() => {
+                this.getPrefixes();
+            });
         },
         deleteSuffix(suffix) {
             this.suffixes.splice(this.suffixes.indexOf(suffix), 1);
