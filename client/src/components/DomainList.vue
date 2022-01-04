@@ -4,10 +4,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-md">
-                    <AppItemsList title="Prefixos" v-bind:items="prefixes" v-on:addItem="addPrefix" v-on:deleteItem="deletePrefix"></AppItemsList>
+                    <AppItemsList title="Prefixos" v-bind:items="items.prefix" v-on:addItem="addItem" type="prefix" v-on:deleteItem="deleteItem"></AppItemsList>
                 </div>
                 <div class="col-md">
-                    <AppItemsList title="Sufixos" v-bind:items="suffixes" v-on:addItem="addSuffix" v-on:deleteItem="deleteSuffix"></AppItemsList>
+                    <AppItemsList title="Sufixos" v-bind:items="items.suffix" v-on:addItem="addItem" type="suffix" v-on:deleteItem="deleteItem"></AppItemsList>
                 </div>
             </div>
             <br />
@@ -49,53 +49,38 @@ export default {
     name: "App",
     data() {
         return {
-            prefixes: [],
-            suffixes: [],
+            items: {
+                prefix: [],
+                suffix: [],
+            }
         };
     },
 
     methods: {
-        getPrefixes() {
+        getItems(type) {
             axios({
                 url: "http://localhost:4000",
                 method: "post",
                 data: {
                     query: `
-                    {
-                        prefixes: items (type: "prefix") {
+                    query ($type: String){
+                        items: items (type: $type) {
                             id
                             type
                             description
                         }
                     }
                 `,
+                variables: {
+                    type
+                }
                 },
             }).then((res) => {
                 const query = res.data;
-                this.prefixes = query.data.prefixes;
+                this.items[type] = query.data.items;
             });
         },
-        getSuffixes() {
-            axios({
-                url: "http://localhost:4000",
-                method: "post",
-                data: {
-                    query: `
-                    {
-                        suffixes: items (type: "suffix") {
-                            id
-                            type
-                            description
-                        }
-                    }
-                `,
-                },
-            }).then((res) => {
-                const query = res.data;
-                this.suffixes = query.data.suffixes;
-            });
-        },
-        addPrefix(prefix) {
+         addItem(item) {
             axios({
                 url: "http://localhost:4000",
                 method: "post",
@@ -110,22 +95,16 @@ export default {
                         }
                     `,
                     variables: {
-                        item: {
-                            type: "prefix",
-                            description: prefix
-                        }
+                        item
                     }
                 }
             }).then((res) => {
                 const query = res.data;
                 const saveItem = query.data.saveItem;
-                this.prefixes.push(saveItem.description);
+                this.items[item.type].push(saveItem);
             });
         },
-        addSuffix(suffix) {
-            this.suffixes.push(suffix);
-        },
-        deletePrefix(prefix) {
+        deleteItem(item) {
             axios({
                 url: "http://localhost:4000",
                 method: "post",
@@ -136,15 +115,12 @@ export default {
                         }
                     `,
                     variables: {
-                        id: prefix.id
+                        id: item.id
                     }
                 }
             }).then(() => {
-                this.getPrefixes();
+                this.getItems(item.type);
             });
-        },
-        deleteSuffix(suffix) {
-            this.suffixes.splice(this.suffixes.indexOf(suffix), 1);
         },
     },
 
@@ -152,8 +128,8 @@ export default {
         // ..apenas executa qdo ocorre uma mudança em prefixes ou suffixes
         domains() {
             const domains = [];
-            for (const prefix of this.prefixes) {
-                for (const suffix of this.suffixes) {
+            for (const prefix of this.items.prefix) {
+                for (const suffix of this.items.suffix) {
                     const name = prefix.description + suffix.description;
                     const checkout = "https://registro.br/busca-dominio/?fqdn=" + name;
                     domains.push({
@@ -167,8 +143,8 @@ export default {
     },
 
     created() {
-        this.getPrefixes();
-        this.getSuffixes();
+        this.getItems("prefix");
+        this.getItems("suffix");
     },
 };
 </script>

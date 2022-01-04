@@ -20,9 +20,9 @@
             </ul>
             <br />
             <div class="input-group">
-                <input v-model="item" v-on:keyup.enter="addItem(item)" class="form-control" type="text" placeholder="Digite o item" />
+                <input v-model="description" v-on:keyup.enter="addItem(type, description)" class="form-control" type="text" placeholder="Digite o item" />
                 <div class="input-group-append">
-                    <button class="btn btn-primary" v-on:click="addItem(item)">
+                    <button class="btn btn-primary" v-on:click="addItem(type, description)">
                         <span class="fa fa-plus"></span>
                     </button>
                 </div>
@@ -35,18 +35,21 @@
 <script>
 export default {
     name: 'AppItemsList',
-    props: ['title','items'],
+    props: ['title','items','type'],
     data() {
         return {
-            item: ""
+            description: ""
         };
     },
 
     methods: {
-        addItem(item) {
+        addItem(type, description) {
             // ..recupera o método passado no componente
-            this.$emit("addItem", item);
-            this.item = "";
+            this.$emit("addItem", {
+                type,
+                description
+            });
+            this.description = "";
         },
         deleteItem(item) {
             this.$emit("deleteItem", item);
