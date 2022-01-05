@@ -54,7 +54,6 @@ export default {
 }
 
 .back-main:hover {
-    cursor: pointer;
     color: var(--light);
 }
 
@@ -64,11 +63,15 @@ export default {
 }
 
 .back-sec:hover {
-    cursor: pointer;
     color: var(--light);
 }
 
 .text-right {
     text-align: right;
+}
+
+button:hover, a:hover {
+    cursor: pointer;
+    opacity: 0.8;
 }
 </style>
