@@ -1,4 +1,5 @@
 const { ApolloServer } = require("apollo-server");
+const dns = require("dns");
 
 // ..typeDefs seria o Schema
 const typeDefs = `
@@ -20,6 +21,7 @@ const typeDefs = `
     type Domain {
         name: String
         checkout: String
+        available: Boolean
     }
 
     type Mutation {
@@ -34,7 +36,22 @@ const items = [
     { id: 2, type: "prefix", description: "NAME" },
     { id: 3, type: "suffix", description: "FIX" },
     { id: 4, type: "suffix", description: "ZATION" },
-]
+];
+
+// ..função para verificar a disponibilidade de um domínio
+const isDomainAvailable = function (url) {
+    return new Promise(function (resolve, reject) {
+        // ..tento resolver este dns, se der erro quer dizer que a url provavelmente não existe
+        dns.resolve(url, function (error) {
+            if (error) {
+                // ..semelhante ao "return", é justamente para utilizar uma promessa, um método assincrono
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        })
+    });
+};
 
 // ..espelha as consultas que eu desejo montar
 const resolvers = {
@@ -62,15 +79,18 @@ const resolvers = {
             return true;
         },
         // .. mutação para verificar um domínio
-        generateDomains(){
+        async generateDomains() {
             const domains = [];
             for (const prefix of items.filter(item => item.type === "prefix")) {
                 for (const suffix of items.filter(item => item.type === "suffix")) {
                     const name = (prefix.description + suffix.description).toUpperCase();
                     const checkout = "https://registro.br/busca-dominio/?fqdn=" + name;
+                    // ..verifica se existe algum domínio com este nome
+                    const available = await isDomainAvailable(name + ".com.br");
                     domains.push({
                         name,
                         checkout,
+                        available
                     });
                 }
             }

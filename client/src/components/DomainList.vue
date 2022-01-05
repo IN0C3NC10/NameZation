@@ -19,10 +19,15 @@
                     <ul class="list-group">
                         <li class="list-group-item" v-for="domain in domains" v-bind:key="domain.name">
                             <div class="row">
-                                <div class="col-md">
+                                <div class="col-md-6">
                                     {{ domain.name }}
                                 </div>
-                                <div class="col-md text-right">
+                                <div class="col-md-3 text-center">
+                                    <span class="badge back-main">
+                                        {{ (domain.available) ? "Disponível" : "Indisponível" }}
+                                    </span>
+                                </div>
+                                <div class="col-md-3 text-right">
                                     <a class="btn btn-primary" v-bind:href="domain.checkout" target="_blank">
                                         <span class="fa fa-shopping-cart"></span>
                                     </a>
@@ -46,7 +51,7 @@ export default {
     components: {
         AppItemsList
     },
-    name: "App",
+    name: "DomainList",
     data() {
         return {
             items: {
@@ -144,11 +149,12 @@ export default {
                             domains: generateDomains {
                                 name
                                 checkout
+                                available
                             }
                         }
                     `
                 }
-            }).then((res)=>{
+            }).then((res) => {
                 const query = res.data;
                 // ..atribui o retorno de domínios a var local 
                 //      (lembrando que é usado "data.domains" pq foi utilizado um alias na "mutation")
