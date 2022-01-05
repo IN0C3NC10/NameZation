@@ -13,16 +13,16 @@
                             {{ item.description }}
                         </div>
                         <div class="col-md text-right">
-                            <button v-on:click="deleteItem(item)" class="btn btn-danger"><span class="fa fa-trash"></span></button>
+                            <button v-on:click="deleteItem(item)" class="btn back-sec"><span class="fa fa-trash"></span></button>
                         </div>
                     </div>
                 </li>
             </ul>
             <br />
             <div class="input-group">
-                <input v-model="description" v-on:keyup.enter="addItem(type, description)" class="form-control" type="text" placeholder="Digite o item" />
+                <input v-model="description" v-on:keyup.enter="addItem(type, description)" class="form-control" type="text" :placeholder="'Digite o '+title+'..'" />
                 <div class="input-group-append">
-                    <button class="btn btn-primary" v-on:click="addItem(type, description)">
+                    <button class="btn back-main" v-on:click="addItem(type, description)">
                         <span class="fa fa-plus"></span>
                     </button>
                 </div>
@@ -35,7 +35,7 @@
 <script>
 export default {
     name: 'AppItemsList',
-    props: ['title','items','type'],
+    props: ['title', 'items', 'type'],
     data() {
         return {
             description: ""

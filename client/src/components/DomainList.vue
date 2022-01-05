@@ -23,12 +23,12 @@
                                     {{ domain.name }}
                                 </div>
                                 <div class="col-md-3 text-center">
-                                    <span class="badge back-main">
+                                    <span :class="(domain.available) ? 'badge back-main' : 'badge back-sec'">
                                         {{ (domain.available) ? "Disponível" : "Indisponível" }}
                                     </span>
                                 </div>
                                 <div class="col-md-3 text-right">
-                                    <a class="btn btn-primary" v-bind:href="domain.checkout" target="_blank">
+                                    <a class="btn back-main" v-bind:href="domain.checkout" target="_blank">
                                         <span class="fa fa-shopping-cart"></span>
                                     </a>
                                 </div>
@@ -54,6 +54,7 @@ export default {
     name: "DomainList",
     data() {
         return {
+            url: "http://localhost:4000",
             items: {
                 prefix: [],
                 suffix: [],
@@ -67,7 +68,7 @@ export default {
         //      (vale lembrar que este é único contando com um "return" justamente pq está associado a "Promise" no "created")
         getItems(type) {
             return axios({
-                url: "http://localhost:4000",
+                url: this.url,
                 method: "post",
                 data: {
                     query: `
@@ -91,7 +92,7 @@ export default {
         // ..método responsável por adicionar um dado no GraphQL
         addItem(item) {
             axios({
-                url: "http://localhost:4000",
+                url: this.url,
                 method: "post",
                 data: {
                     query: `
@@ -119,7 +120,7 @@ export default {
         // ..método responsável por deletar um dado no GraphQL
         deleteItem(item) {
             axios({
-                url: "http://localhost:4000",
+                url: this.url,
                 method: "post",
                 data: {
                     query: `
@@ -141,7 +142,7 @@ export default {
         // ..método responsável por verificar um domínio
         generateDomains() {
             axios({
-                url: "http://localhost:4000",
+                url: this.url,
                 method: "post",
                 data: {
                     query: `
