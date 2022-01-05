@@ -17,9 +17,15 @@ const typeDefs = `
         description: String
     }
 
+    type Domain {
+        name: String
+        checkout: String
+    }
+
     type Mutation {
         saveItem(item: ItemInput): Item
         deleteItem(id: Int): Boolean
+        generateDomains: [Domain]
     }
 `;
 
@@ -54,6 +60,21 @@ const resolvers = {
             // ..se encontrou, remova na lista aqui do servidor
             items.splice(items.indexOf(item), 1);
             return true;
+        },
+        // .. mutação para verificar um domínio
+        generateDomains(){
+            const domains = [];
+            for (const prefix of items.filter(item => item.type === "prefix")) {
+                for (const suffix of items.filter(item => item.type === "suffix")) {
+                    const name = (prefix.description + suffix.description).toUpperCase();
+                    const checkout = "https://registro.br/busca-dominio/?fqdn=" + name;
+                    domains.push({
+                        name,
+                        checkout,
+                    });
+                }
+            }
+            return domains;
         }
     }
 }

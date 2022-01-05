@@ -52,13 +52,16 @@ export default {
             items: {
                 prefix: [],
                 suffix: [],
-            }
+            },
+            domains: []
         };
     },
 
     methods: {
+        // ..método responsável por recuperar os dados do GraphQL
+        //      (vale lembrar que este é único contando com um "return" justamente pq está associado a "Promise" no "created")
         getItems(type) {
-            axios({
+            return axios({
                 url: "http://localhost:4000",
                 method: "post",
                 data: {
@@ -71,16 +74,17 @@ export default {
                         }
                     }
                 `,
-                variables: {
-                    type
-                }
+                    variables: {
+                        type
+                    }
                 },
             }).then((res) => {
                 const query = res.data;
                 this.items[type] = query.data.items;
             });
         },
-         addItem(item) {
+        // ..método responsável por adicionar um dado no GraphQL
+        addItem(item) {
             axios({
                 url: "http://localhost:4000",
                 method: "post",
@@ -101,9 +105,13 @@ export default {
             }).then((res) => {
                 const query = res.data;
                 const saveItem = query.data.saveItem;
+                // ..adiciona o item no array "items" de acordo com o seu tipo
                 this.items[item.type].push(saveItem);
+                // ..gera novamente os domínios
+                this.generateDomains();
             });
         },
+        // ..método responsável por deletar um dado no GraphQL
         deleteItem(item) {
             axios({
                 url: "http://localhost:4000",
@@ -119,32 +127,45 @@ export default {
                     }
                 }
             }).then(() => {
-                this.getItems(item.type);
+                // ..usando o "splice" poderia ser feito várias coisas mas, neste caso estamos deletando no array local
+                this.items[item.type].splice(this.items[item.type].indexOf(item), 1);
+                // ..gera novamente os domínios
+                this.generateDomains();
             });
         },
-    },
-
-    computed: {
-        // ..apenas executa qdo ocorre uma mudança em prefixes ou suffixes
-        domains() {
-            const domains = [];
-            for (const prefix of this.items.prefix) {
-                for (const suffix of this.items.suffix) {
-                    const name = prefix.description + suffix.description;
-                    const checkout = "https://registro.br/busca-dominio/?fqdn=" + name;
-                    domains.push({
-                        name,
-                        checkout,
-                    });
+        // ..método responsável por verificar um domínio
+        generateDomains() {
+            axios({
+                url: "http://localhost:4000",
+                method: "post",
+                data: {
+                    query: `
+                        mutation {
+                            domains: generateDomains {
+                                name
+                                checkout
+                            }
+                        }
+                    `
                 }
-            }
-            return domains;
-        },
+            }).then((res)=>{
+                const query = res.data;
+                // ..atribui o retorno de domínios a var local 
+                //      (lembrando que é usado "data.domains" pq foi utilizado um alias na "mutation")
+                this.domains = query.data.domains;
+            });
+        }
     },
 
     created() {
-        this.getItems("prefix");
-        this.getItems("suffix");
+        // ..recebe um array que somente após receber suas promessas, entra no then
+        //    (pois o generateDomains sozinho com os demais, inicia antes de receber os dados)
+        Promise.all([
+            this.getItems("prefix"),
+            this.getItems("suffix"),
+        ]).then(() => {
+            this.generateDomains();
+        });
     },
 };
 </script>
