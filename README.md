@@ -18,8 +18,8 @@
 	<img src="https://img.shields.io/badge/Frontend-Vue-4FC08D?style=for-the-badge&logo=Vue.js" title="Frontend com Vue" alt="Frontend com Vue"></img>
   <img src="https://img.shields.io/badge/Backend-Node-6DB33F?style=for-the-badge&logo=Node.js&logoColor=6DB33F" title="Backend com Node" alt="Backend com Node"></img>
     <img src="https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=Postgresql&logoColor=4169E1" title="Banco de dados PostgreSQL" alt="Banco de dados PostgreSQL"></img>
-    <!--<img src="https://img.shields.io/badge/Status-Done-blue?style=for-the-badge" title="Status do Projeto:Concluído" alt="Status do Projeto:Concluído"></img>-->
-    <img src="https://img.shields.io/badge/Status-Working-F08705?style=for-the-badge" title="Status do Projeto: Trabalhando" alt="Status do Projeto: Trabalhando"></img>
+    <img src="https://img.shields.io/badge/Status-Done-blue?style=for-the-badge" title="Status do Projeto:Concluído" alt="Status do Projeto:Concluído"></img>
+    <!-- <img src="https://img.shields.io/badge/Status-Working-F08705?style=for-the-badge" title="Status do Projeto: Trabalhando" alt="Status do Projeto: Trabalhando"></img> -->
 </p>
 
 
@@ -37,6 +37,7 @@ Antes de iniciarmos, você vai precisar ter instalado em sua máquina as seguint
 
 - [Vue](https://vuejs.org/)
 - [Node](https://nodejs.org/en/)
+- [PostgreSQL](https://www.postgresql.org/download/)
 
 Também facilita muito você possuir um editor para trabalhar com o código, fica a dica o [VSCode](https://code.visualstudio.com/).
 
@@ -45,8 +46,8 @@ Também facilita muito você possuir um editor para trabalhar com o código, fic
 <h2 align="left" id="features">Funcionalidades</h2>
 
 - [x] Cadastro de Prefixo e Sufixo;
+- [x] Gerador de nomes com base nos Prefixos e Sufixos;
 - [x] Verificar a disponibilidade do domínio no site [registro.br](https://registro.br/);
-- [ ] Dados salvos no banco de dados;
 
 
 <!-- Executando o app -->
@@ -60,6 +61,10 @@ $ git clone https://github.com/IN0C3NC10/NameZation.git
 
 # Instale os pacotes necessários p/ execução com
 $ npm install
+
+# Antes de tudo, pegue o script sql em database e crie sua tabela
+
+# Depois, crie um arquivo ".env" no server e preencha com suas informações, com base no ".env-example"
 
 # Sensacional, agora precisaremos de 2 terminais
 
