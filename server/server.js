@@ -1,5 +1,8 @@
 const { ApolloServer } = require("apollo-server");
 const dns = require("dns");
+const service = require("./service");
+// ..recupera as informações da variável de ambiente
+require('dotenv').config();
 
 // ..typeDefs seria o Schema
 const typeDefs = `
@@ -31,13 +34,6 @@ const typeDefs = `
     }
 `;
 
-const items = [
-    { id: 1, type: "prefix", description: "PRE" },
-    { id: 2, type: "prefix", description: "NAME" },
-    { id: 3, type: "suffix", description: "FIX" },
-    { id: 4, type: "suffix", description: "ZATION" },
-];
-
 // ..função para verificar a disponibilidade de um domínio
 const isDomainAvailable = function (url) {
     return new Promise(function (resolve, reject) {
@@ -56,31 +52,29 @@ const isDomainAvailable = function (url) {
 // ..espelha as consultas que eu desejo montar
 const resolvers = {
     Query: {
-        items(_, args) {
-            return items.filter(item => item.type == args.type);
+        async items(_, args) {
+            const items = await service.getItemsByType(args.type);
+            return items;
         }
     },
     Mutation: {
         // .. mutação para salvar os dados
-        saveItem(_, args) {
+        async saveItem(_, args) {
             const item = args.item;
-            item.id = Math.floor(Math.random() * 1000);
-            items.push(item);
-            return item;
+            // ..o "[]" é pq sempre é retornado um array, com isto recuperamos apenas a primeira linha
+            const [newItem] = await service.saveItem(item);
+            return newItem;
         },
         // .. mutação para deletar um dado
-        deleteItem(_, args) {
+        async deleteItem(_, args) {
             const id = args.id;
-            const item = items.find(item => item.id === id);
-            // ..se não encontrou ninguem
-            if (!item) return false;
-            // ..se encontrou, remova na lista aqui do servidor
-            items.splice(items.indexOf(item), 1);
+            await service.deleteItem(id);
             return true;
         },
         // .. mutação para verificar um domínio
         async generateDomains() {
             const domains = [];
+            const items = await service.getItems();
             for (const prefix of items.filter(item => item.type === "prefix")) {
                 for (const suffix of items.filter(item => item.type === "suffix")) {
                     const name = (prefix.description + suffix.description).toUpperCase();
@@ -100,5 +94,5 @@ const resolvers = {
 }
 
 const server = new ApolloServer({ typeDefs, resolvers });
-server.listen(4000);
-console.log('Server Started');
+server.listen(process.env.APP_PORT);
+console.log('Server Started..');
